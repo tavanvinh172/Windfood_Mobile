@@ -1,6 +1,10 @@
 package com.project.windfood_client;
 
+import android.app.ActionBar;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,6 +12,7 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.LiveData;
@@ -41,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         doInitialization();
 //        sharedPrefManager.clearToken();
+    }
+    private void doInitialization(){
+        authViewModels = new ViewModelProvider(this).get(AuthViewModels.class);
+        sharedPrefManager = new SharedPrefManager(this);
         if(sharedPrefManager.getToken().isEmpty()){
             binding = ActivityAuthBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
@@ -58,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
                             if(!response.isEmpty()){
                                 sharedPrefManager.saveToken(response.toString());
                                 CustomToast.makeText(MainActivity.this, "Đăng nhập thành công!", CustomToast.LENGTH_LONG, CustomToast.SUCCESS, true).show();
+                                if(!sharedPrefManager.getToken().isEmpty()){
+                                    finish();
+                                    startActivity(getIntent());
+                                }
                             }else{
                                 CustomToast.makeText(MainActivity.this, "Đăng nhập thất bại!", CustomToast.LENGTH_LONG, CustomToast.ERROR, true).show();
                             }
@@ -68,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(mainBinding.getRoot());
+            final ActionBar actionBar = getActionBar();
 
             BottomNavigationView navView = findViewById(R.id.nav_view);
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -78,8 +92,26 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(mainBinding.navView, navController);
         }
     }
-    private void doInitialization(){
-        authViewModels = new ViewModelProvider(this).get(AuthViewModels.class);
-        sharedPrefManager = new SharedPrefManager(this);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(!sharedPrefManager.getToken().isEmpty()){
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.dropdown_menu, menu);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.personalInforId){
+
+        }else if(id == R.id.logoutId){
+            sharedPrefManager.clearToken();
+            finish();
+            startActivity(getIntent());
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
