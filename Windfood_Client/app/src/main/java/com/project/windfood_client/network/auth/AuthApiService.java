@@ -14,7 +14,4 @@ public interface AuthApiService {
 
     @POST("persons/login")
     Call<String> loginUser(@Body User user);
-
-    @GET("most-popular")
-    Call<Object> getMostPopularTVShows(@Query("page") int page);
 }

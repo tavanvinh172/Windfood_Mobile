@@ -42,19 +42,4 @@ public class AuthRepositories {
         return data;
     }
 
-    public LiveData<Object> getMostPopularTVShows(int page){
-        MutableLiveData<Object> data = new MutableLiveData<>();
-        authApiService.getMostPopularTVShows(page).enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(@NonNull Call<Object> call,@NonNull Response<Object> response) {
-                data.setValue(response.body());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Object> call,@NonNull Throwable t) {
-                data.setValue(null) ;
-            }
-        });
-        return data;
-    }
 }
